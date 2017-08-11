@@ -6,7 +6,7 @@
   <version>@snapshot@</version>
   <vendor url="http://www.jetbrains.com">JetBrains s.r.o.</vendor>
 
-  <idea-version since-build="172.1" until-build="172.*"/>
+  <idea-version since-build="171.1" until-build="172.*"/>
 
   <depends>com.intellij.modules.java</depends>
 
@@ -2626,7 +2626,7 @@
                      level="WARNING"
                      language="kotlin"
     />
-	
+
 	<localInspection implementationClass="org.jetbrains.kotlin.idea.inspections.ExplicitThisInspection"
                      displayName="Redundant explicit 'this'"
                      groupPath="Kotlin"
