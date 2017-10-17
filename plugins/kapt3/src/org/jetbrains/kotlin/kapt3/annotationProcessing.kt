@@ -16,6 +16,7 @@
 
 package org.jetbrains.kotlin.kapt3
 
+import com.intellij.openapi.util.SystemInfo
 import com.sun.tools.javac.comp.CompileStates
 import com.sun.tools.javac.file.JavacFileManager
 import com.sun.tools.javac.main.JavaCompiler
@@ -24,10 +25,14 @@ import com.sun.tools.javac.processing.AnnotationProcessingError
 import com.sun.tools.javac.processing.JavacFiler
 import com.sun.tools.javac.processing.JavacProcessingEnvironment
 import com.sun.tools.javac.tree.JCTree
+import com.sun.tools.javac.util.Options
 import org.jetbrains.kotlin.kapt3.diagnostic.KaptError
+import org.jetbrains.kotlin.kapt3.util.isJava9OrLater
+import org.jetbrains.kotlin.kapt3.util.putJavacOption
 import java.io.File
 import javax.annotation.processing.Processor
 import javax.tools.JavaFileManager
+import javax.tools.JavaFileObject
 import com.sun.tools.javac.util.List as JavacList
 
 fun KaptContext<*>.doAnnotationProcessing(
@@ -45,11 +50,11 @@ fun KaptContext<*>.doAnnotationProcessing(
         put(Option.PROC, "only") // Only process annotations
 
         if (!withJdk) {
-            put(Option.BOOTCLASSPATH, "") // No boot classpath
+            putJavacOption("BOOTCLASSPATH", "BOOT_CLASS_PATH", "") // No boot classpath
         }
 
-        put(Option.CLASSPATH, compileClasspath.joinToString(File.pathSeparator) { it.canonicalPath })
-        put(Option.PROCESSORPATH, annotationProcessingClasspath.joinToString(File.pathSeparator) { it.canonicalPath })
+        putJavacOption("CLASSPATH", "CLASS_PATH", compileClasspath.joinToString(File.pathSeparator) { it.canonicalPath })
+        putJavacOption("PROCESSORPATH", "PROCESSOR_PATH", annotationProcessingClasspath.joinToString(File.pathSeparator) { it.canonicalPath })
         put(Option.PROCESSOR, annotationProcessors)
         put(Option.S, sourcesOutputDir.canonicalPath)
         put(Option.D, classesOutputDir.canonicalPath)
@@ -61,7 +66,13 @@ fun KaptContext<*>.doAnnotationProcessing(
 
     val compilerAfterAP: JavaCompiler
     try {
-        compiler.initProcessAnnotations(processors)
+        if (isJava9OrLater) {
+            val initProcessAnnotationsMethod = JavaCompiler::class.java.declaredMethods.single { it.name == "initProcessAnnotations" }
+            initProcessAnnotationsMethod.invoke(compiler, processors, emptyList<JavaFileObject>(), emptyList<String>())
+        }
+        else {
+            compiler.initProcessAnnotations(processors)
+        }
 
         val javaFileObjects = fileManager.getJavaFileObjectsFromFiles(javaSourceFiles)
         val parsedJavaFiles = compiler.parseFiles(javaFileObjects)
@@ -70,7 +81,14 @@ fun KaptContext<*>.doAnnotationProcessing(
             javaLog.interceptorData.files = parsedJavaFiles.map { it.sourceFile to it }.toMap()
             val analyzedFiles = compiler.stopIfErrorOccurred(
                     CompileStates.CompileState.PARSE, compiler.enterTrees(parsedJavaFiles + additionalSources))
-            compiler.processAnnotations(analyzedFiles)
+
+            if (isJava9OrLater) {
+                compiler.processAnnotations(analyzedFiles)
+                compiler
+            }
+            else {
+                compiler.processAnnotations(analyzedFiles)
+            }
         } catch (e: AnnotationProcessingError) {
             throw KaptError(KaptError.Kind.EXCEPTION, e.cause ?: e)
         }
