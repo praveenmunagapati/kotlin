@@ -45,6 +45,11 @@ import kotlin.coroutines.experimental.processBareContinuationResume
 public inline suspend fun <T> suspendCoroutineOrReturn(crossinline block: (Continuation<T>) -> Any?): T =
         throw NotImplementedError("Implementation is intrinsic")
 
+@SinceKotlin("1.2")
+@kotlin.internal.InlineOnly
+public inline suspend fun <T> suspendCoroutineUninterceptedOrReturn(crossinline block: (Continuation<T>) -> Any?): T =
+        throw NotImplementedError("Implementation is intrinsic")
+
 /**
  * Continuation context of current coroutine.
  *

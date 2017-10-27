@@ -172,7 +172,7 @@ private fun NewResolvedCallImpl<VariableDescriptor>.asDummyOldResolvedCall(bindi
 fun ResolvedCall<*>.isSuspendNoInlineCall() =
         resultingDescriptor.safeAs<FunctionDescriptor>()
                 ?.let {
-                    it.isSuspend && (!it.isInline || it.isBuiltInSuspendCoroutineOrReturnInJvm())
+                    it.isSuspend && (!it.isInline || it.isBuiltInSuspendCoroutineOrReturnInJvm() || it.isBuiltInSuspendCoroutineUninterceptedOrReturn())
                 } == true
 
 fun CallableDescriptor.isSuspendFunctionNotSuspensionView(): Boolean {
@@ -314,6 +314,39 @@ fun createMethodNodeForCoroutineContext(functionDescriptor: FunctionDescriptor):
     )
     node.visitInsn(Opcodes.ARETURN)
     node.visitMaxs(1, 1)
+
+    return node
+}
+
+
+fun createMethodNodeForSuspendCoroutineUninterceptedOrReturn(
+        functionDescriptor: FunctionDescriptor,
+        typeMapper: KotlinTypeMapper
+): MethodNode {
+    assert(functionDescriptor.isBuiltInSuspendCoroutineUninterceptedOrReturn()) {
+        "functionDescriptor must be kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn"
+    }
+
+    val node =
+            MethodNode(
+                    Opcodes.ASM5,
+                    Opcodes.ACC_STATIC,
+                    "fake",
+                    typeMapper.mapAsmMethod(functionDescriptor).descriptor, null, null
+            )
+
+    node.visitVarInsn(Opcodes.ALOAD, 0)
+    node.visitVarInsn(Opcodes.ALOAD, 1)
+
+    node.visitMethodInsn(
+            Opcodes.INVOKEINTERFACE,
+            typeMapper.mapType(functionDescriptor.valueParameters[0]).internalName,
+            OperatorNameConventions.INVOKE.identifier,
+            "(${AsmTypes.OBJECT_TYPE})${AsmTypes.OBJECT_TYPE}",
+            true
+    )
+    node.visitInsn(Opcodes.ARETURN)
+    node.visitMaxs(2, 2)
 
     return node
 }

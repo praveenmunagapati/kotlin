@@ -5868,6 +5868,12 @@ public class BlackBoxCodegenTestGenerated extends AbstractBlackBoxCodegenTest {
                 String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/coroutines/intrinsicSemantics/startCoroutineUninterceptedOrReturnInterception.kt");
                 doTest(fileName);
             }
+
+            @TestMetadata("suspendCoroutineUninterceptedOrReturn.kt")
+            public void testSuspendCoroutineUninterceptedOrReturn() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/coroutines/intrinsicSemantics/suspendCoroutineUninterceptedOrReturn.kt");
+                doTest(fileName);
+            }
         }
 
         @TestMetadata("compiler/testData/codegen/box/coroutines/multiModule")
