@@ -496,7 +496,7 @@ abstract class InlineCodegen<out T: BaseExpressionCodegen>(
                         createMethodNodeForCoroutineContext(functionDescriptor),
                         SMAPParser.parseOrCreateDefault(null, null, "fake", -1, -1)
                     )
-                functionDescriptor.isBuiltInSuspendCoroutineUninterceptedOrReturn() ->
+                functionDescriptor.isBuiltInSuspendCoroutineUninterceptedOrReturnInJvm() ->
                     return SMAPAndMethodNode(
                         createMethodNodeForSuspendCoroutineUninterceptedOrReturn(functionDescriptor, state.typeMapper),
                         SMAPParser.parseOrCreateDefault(null, null, "fake", -1, -1)

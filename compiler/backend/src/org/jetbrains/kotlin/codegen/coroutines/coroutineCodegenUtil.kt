@@ -172,7 +172,7 @@ private fun NewResolvedCallImpl<VariableDescriptor>.asDummyOldResolvedCall(bindi
 fun ResolvedCall<*>.isSuspendNoInlineCall() =
         resultingDescriptor.safeAs<FunctionDescriptor>()
                 ?.let {
-                    it.isSuspend && (!it.isInline || it.isBuiltInSuspendCoroutineOrReturnInJvm() || it.isBuiltInSuspendCoroutineUninterceptedOrReturn())
+                    it.isSuspend && (!it.isInline || it.isBuiltInSuspendCoroutineOrReturnInJvm() || it.isBuiltInSuspendCoroutineUninterceptedOrReturnInJvm())
                 } == true
 
 fun CallableDescriptor.isSuspendFunctionNotSuspensionView(): Boolean {
@@ -249,6 +249,9 @@ fun ModuleDescriptor.getContinuationOfTypeOrAny(kotlinType: KotlinType) =
 fun FunctionDescriptor.isBuiltInSuspendCoroutineOrReturnInJvm() =
         getUserData(INITIAL_DESCRIPTOR_FOR_SUSPEND_FUNCTION)?.isBuiltInSuspendCoroutineOrReturn() == true
 
+fun FunctionDescriptor.isBuiltInSuspendCoroutineUninterceptedOrReturnInJvm() =
+        getUserData(INITIAL_DESCRIPTOR_FOR_SUSPEND_FUNCTION)?.isBuiltInSuspendCoroutineUninterceptedOrReturn() == true
+
 fun createMethodNodeForSuspendCoroutineOrReturn(
         functionDescriptor: FunctionDescriptor,
         typeMapper: KotlinTypeMapper
@@ -323,7 +326,7 @@ fun createMethodNodeForSuspendCoroutineUninterceptedOrReturn(
         functionDescriptor: FunctionDescriptor,
         typeMapper: KotlinTypeMapper
 ): MethodNode {
-    assert(functionDescriptor.isBuiltInSuspendCoroutineUninterceptedOrReturn()) {
+    assert(functionDescriptor.isBuiltInSuspendCoroutineUninterceptedOrReturnInJvm()) {
         "functionDescriptor must be kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn"
     }
 
