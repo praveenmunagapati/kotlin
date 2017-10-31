@@ -16,7 +16,6 @@
 
 package org.jetbrains.kotlin.kapt3
 
-import com.intellij.openapi.util.SystemInfo
 import com.sun.tools.javac.comp.CompileStates
 import com.sun.tools.javac.file.JavacFileManager
 import com.sun.tools.javac.main.JavaCompiler
@@ -25,7 +24,6 @@ import com.sun.tools.javac.processing.AnnotationProcessingError
 import com.sun.tools.javac.processing.JavacFiler
 import com.sun.tools.javac.processing.JavacProcessingEnvironment
 import com.sun.tools.javac.tree.JCTree
-import com.sun.tools.javac.util.Options
 import org.jetbrains.kotlin.kapt3.diagnostic.KaptError
 import org.jetbrains.kotlin.kapt3.util.isJava9OrLater
 import org.jetbrains.kotlin.kapt3.util.putJavacOption
@@ -75,7 +73,21 @@ fun KaptContext<*>.doAnnotationProcessing(
         }
 
         val javaFileObjects = fileManager.getJavaFileObjectsFromFiles(javaSourceFiles)
-        val parsedJavaFiles = compiler.parseFiles(javaFileObjects)
+        var parsedJavaFiles = compiler.stopIfErrorOccurred(
+                CompileStates.CompileState.PARSE, compiler.parseFiles(javaFileObjects))
+
+        if (isJava9OrLater) {
+            val initModulesMethod = compiler.javaClass.getMethod("initModules", JavacList::class.java)
+
+            @Suppress("UNCHECKED_CAST")
+            parsedJavaFiles = compiler.stopIfErrorOccurred(
+                    CompileStates.CompileState.PARSE,
+                    initModulesMethod.invoke(compiler, parsedJavaFiles) as JavacList<JCTree.JCCompilationUnit>)
+        }
+
+        if (compiler.shouldStop(CompileStates.CompileState.PARSE)) {
+            throw KaptError(KaptError.Kind.ERROR_RAISED)
+        }
 
         compilerAfterAP = try {
             javaLog.interceptorData.files = parsedJavaFiles.map { it.sourceFile to it }.toMap()
@@ -83,7 +95,8 @@ fun KaptContext<*>.doAnnotationProcessing(
                     CompileStates.CompileState.PARSE, compiler.enterTrees(parsedJavaFiles + additionalSources))
 
             if (isJava9OrLater) {
-                compiler.processAnnotations(analyzedFiles)
+                val processAnnotationsMethod = compiler.javaClass.getMethod("processAnnotations", JavacList::class.java)
+                processAnnotationsMethod.invoke(compiler, analyzedFiles)
                 compiler
             }
             else {
