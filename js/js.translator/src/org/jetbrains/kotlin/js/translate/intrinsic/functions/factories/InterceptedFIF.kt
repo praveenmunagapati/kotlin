@@ -22,6 +22,8 @@ import org.jetbrains.kotlin.js.backend.ast.JsExpression
 import org.jetbrains.kotlin.js.translate.callTranslator.CallInfo
 import org.jetbrains.kotlin.js.translate.context.TranslationContext
 import org.jetbrains.kotlin.js.translate.intrinsic.functions.basic.FunctionIntrinsic
+import org.jetbrains.kotlin.js.translate.utils.JsAstUtils
+import org.jetbrains.kotlin.js.translate.utils.TranslationUtils
 
 object InterceptedFIF: FunctionIntrinsicFactory {
     override fun getIntrinsic(descriptor: FunctionDescriptor): FunctionIntrinsic? {
@@ -30,6 +32,10 @@ object InterceptedFIF: FunctionIntrinsicFactory {
     }
 
     object Intrinsic: FunctionIntrinsic() {
-        override fun apply(callInfo: CallInfo, arguments: List<JsExpression>, context: TranslationContext) = callInfo.extensionReceiver!!
+        override fun apply(callInfo: CallInfo, arguments: List<JsExpression>, context: TranslationContext): JsExpression {
+            val continuation = callInfo.extensionReceiver ?: error("intercepted shall be extension function")
+            val facadeName = context.getNameForDescriptor(TranslationUtils.getCoroutineProperty(context, "facade"))
+            return JsAstUtils.pureFqn(facadeName, continuation)
+        }
     }
 }
