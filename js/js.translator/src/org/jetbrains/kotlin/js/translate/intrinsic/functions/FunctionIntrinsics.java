@@ -53,6 +53,7 @@ public final class FunctionIntrinsics {
         register(AsDynamicFIF.INSTANCE);
         register(CoroutineContextFIF.INSTANCE);
         register(SuspendCoroutineUninterceptedOrReturnFIF.INSTANCE);
+        register(InterceptedFIF.INSTANCE);
     }
 
     private void register(@NotNull FunctionIntrinsicFactory instance) {

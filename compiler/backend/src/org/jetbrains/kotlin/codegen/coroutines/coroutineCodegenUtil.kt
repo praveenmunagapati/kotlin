@@ -245,12 +245,8 @@ fun ModuleDescriptor.getContinuationOfTypeOrAny(kotlinType: KotlinType) =
             )
         } ?: module.builtIns.nullableAnyType
 
-
 fun FunctionDescriptor.isBuiltInSuspendCoroutineOrReturnInJvm() =
         getUserData(INITIAL_DESCRIPTOR_FOR_SUSPEND_FUNCTION)?.isBuiltInSuspendCoroutineOrReturn() == true
-
-fun FunctionDescriptor.isBuiltInSuspendCoroutineUninterceptedOrReturnInJvm() =
-        getUserData(INITIAL_DESCRIPTOR_FOR_SUSPEND_FUNCTION)?.isBuiltInSuspendCoroutineUninterceptedOrReturn() == true
 
 fun createMethodNodeForSuspendCoroutineOrReturn(
         functionDescriptor: FunctionDescriptor,
@@ -288,6 +284,40 @@ fun createMethodNodeForSuspendCoroutineOrReturn(
     )
     node.visitInsn(Opcodes.ARETURN)
     node.visitMaxs(2, 2)
+
+    return node
+}
+
+fun FunctionDescriptor.isBuiltInSuspendCoroutineUninterceptedOrReturnInJvm() =
+        getUserData(INITIAL_DESCRIPTOR_FOR_SUSPEND_FUNCTION)?.isBuiltInSuspendCoroutineUninterceptedOrReturn() == true
+
+fun createMethodNodeForIntercepted(
+        functionDescriptor: FunctionDescriptor,
+        typeMapper: KotlinTypeMapper
+): MethodNode {
+    assert(functionDescriptor.isBuiltInIntercepted()) {
+        "functionDescriptor must be kotlin.coroutines.intrinsics.intercepted"
+    }
+
+    val node =
+            MethodNode(
+                    Opcodes.ASM5,
+                    Opcodes.ACC_STATIC,
+                    "fake",
+                    typeMapper.mapAsmMethod(functionDescriptor).descriptor, null, null
+            )
+
+    node.visitVarInsn(Opcodes.ALOAD, 0)
+
+    node.visitMethodInsn(
+            Opcodes.INVOKESTATIC,
+            INTERNAL_COROUTINE_INTRINSICS_OWNER_INTERNAL_NAME,
+            NORMALIZE_CONTINUATION_METHOD_NAME,
+            Type.getMethodDescriptor(CONTINUATION_ASM_TYPE, CONTINUATION_ASM_TYPE),
+            false
+    )
+    node.visitInsn(Opcodes.ARETURN)
+    node.visitMaxs(1, 1)
 
     return node
 }

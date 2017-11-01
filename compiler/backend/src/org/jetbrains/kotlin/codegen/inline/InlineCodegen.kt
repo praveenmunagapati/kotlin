@@ -19,7 +19,7 @@ package org.jetbrains.kotlin.codegen.inline
 import com.intellij.psi.PsiElement
 import com.intellij.util.ArrayUtil
 import org.jetbrains.kotlin.backend.common.isBuiltInCoroutineContext
-import org.jetbrains.kotlin.backend.common.isBuiltInSuspendCoroutineUninterceptedOrReturn
+import org.jetbrains.kotlin.backend.common.isBuiltInIntercepted
 import org.jetbrains.kotlin.builtins.BuiltInsPackageFragment
 import org.jetbrains.kotlin.codegen.*
 import org.jetbrains.kotlin.codegen.AsmUtil.getMethodAsmFlags
@@ -488,8 +488,13 @@ abstract class InlineCodegen<out T: BaseExpressionCodegen>(
                 }
                 functionDescriptor.isBuiltInSuspendCoroutineOrReturnInJvm() ->
                     return SMAPAndMethodNode(
-                        createMethodNodeForSuspendCoroutineOrReturn(functionDescriptor, state.typeMapper),
-                        SMAPParser.parseOrCreateDefault(null, null, "fake", -1, -1)
+                            createMethodNodeForSuspendCoroutineOrReturn(functionDescriptor, state.typeMapper),
+                            SMAPParser.parseOrCreateDefault(null, null, "fake", -1, -1)
+                    )
+                functionDescriptor.isBuiltInIntercepted() ->
+                    return SMAPAndMethodNode(
+                            createMethodNodeForIntercepted(functionDescriptor, state.typeMapper),
+                            SMAPParser.parseOrCreateDefault(null, null, "fake", -1, -1)
                     )
                 functionDescriptor.isBuiltInCoroutineContext() ->
                     return SMAPAndMethodNode(
