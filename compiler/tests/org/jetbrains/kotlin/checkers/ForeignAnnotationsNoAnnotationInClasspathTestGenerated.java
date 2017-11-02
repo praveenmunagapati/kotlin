@@ -172,6 +172,12 @@ public class ForeignAnnotationsNoAnnotationInClasspathTestGenerated extends Abst
                 doTest(fileName);
             }
 
+            @TestMetadata("withSafeCalls.kt")
+            public void testWithSafeCalls() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/foreignAnnotations/tests/jsr305/nullabilityWarnings/withSafeCalls.kt");
+                doTest(fileName);
+            }
+
             @TestMetadata("compiler/testData/foreignAnnotations/tests/jsr305/nullabilityWarnings/fromPlatformTypes")
             @TestDataPath("$PROJECT_ROOT")
             @RunWith(JUnit3RunnerWithInners.class)

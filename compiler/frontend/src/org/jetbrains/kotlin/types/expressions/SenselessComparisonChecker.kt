@@ -17,6 +17,7 @@
 package org.jetbrains.kotlin.types.expressions
 
 import org.jetbrains.kotlin.diagnostics.Errors
+import org.jetbrains.kotlin.diagnostics.reportDiagnosticOnce
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.KtBinaryExpression
 import org.jetbrains.kotlin.psi.KtExpression
@@ -61,6 +62,6 @@ object SenselessComparisonChecker {
                     else -> return
                 }
 
-        context.trace.report(Errors.SENSELESS_COMPARISON.on(expression, expression, expressionIsAlways))
+        context.trace.reportDiagnosticOnce(Errors.SENSELESS_COMPARISON.on(expression, expression, expressionIsAlways))
     }
 }
