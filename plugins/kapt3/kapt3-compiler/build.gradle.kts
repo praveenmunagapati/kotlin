@@ -10,10 +10,11 @@ dependencies {
     compile(project(":compiler:frontend"))
     compile(project(":compiler:frontend.java"))
     compile(project(":compiler:plugin-api"))
+    compileOnly(project(":kotlin-annotation-processing-runtime"))
+
     testCompile(project(":compiler.tests-common"))
     testCompile(commonDep("junit:junit"))
-
-    compileOnly(project(":kotlin-annotation-processing-runtime"))
+    testCompile(project(":kotlin-annotation-processing-runtime"))
 }
 
 sourceSets {
