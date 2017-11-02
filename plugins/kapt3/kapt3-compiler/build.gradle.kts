@@ -12,6 +12,8 @@ dependencies {
     compile(project(":compiler:plugin-api"))
     testCompile(project(":compiler.tests-common"))
     testCompile(commonDep("junit:junit"))
+
+    compileOnly(project(":kotlin-annotation-processing-runtime"))
 }
 
 sourceSets {
@@ -19,10 +21,15 @@ sourceSets {
     "test" { projectDefault() }
 }
 
+runtimeJar {
+    from(getSourceSetsFrom(":kotlin-annotation-processing-runtime")["main"].output.classesDirs)
+}
+
 testsJar {}
 
 projectTest {
     workingDir = rootDir
+    dependsOnTaskIfExistsRec("dist", project = rootProject)
 }
 
 runtimeJar()
