@@ -19,7 +19,7 @@ package org.jetbrains.kotlin.types
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.renderer.DescriptorRenderer
 import org.jetbrains.kotlin.renderer.DescriptorRendererOptions
-import org.jetbrains.kotlin.resolve.scopes.MemberScope
+import org.jetbrains.kotlin.types.typeUtil.replaceAnnotations
 
 interface TypeWithEnhancement {
     val origin: UnwrappedType
@@ -35,10 +35,10 @@ class SimpleTypeWithEnhancement(
     override val origin: UnwrappedType get() = delegate
 
     override fun replaceAnnotations(newAnnotations: Annotations): SimpleType
-            = origin.replaceAnnotations(newAnnotations).wrapEnhancement(enhancement) as SimpleType
+            = origin.replaceAnnotations(newAnnotations).wrapEnhancement(enhancement.replaceAnnotations(newAnnotations)) as SimpleType
 
     override fun makeNullableAsSpecified(newNullability: Boolean): SimpleType
-            = origin.makeNullableAsSpecified(newNullability).wrapEnhancement(enhancement) as SimpleType
+            = origin.makeNullableAsSpecified(newNullability).wrapEnhancement(TypeUtils.makeNullableAsSpecified(enhancement, newNullability)) as SimpleType
 }
 
 class FlexibleTypeWithEnhancement(
@@ -48,10 +48,10 @@ class FlexibleTypeWithEnhancement(
     TypeWithEnhancement {
 
     override fun replaceAnnotations(newAnnotations: Annotations): UnwrappedType
-            = origin.replaceAnnotations(newAnnotations).wrapEnhancement(enhancement)
+            = origin.replaceAnnotations(newAnnotations).wrapEnhancement(enhancement.replaceAnnotations(newAnnotations))
 
     override fun makeNullableAsSpecified(newNullability: Boolean): UnwrappedType
-            = origin.makeNullableAsSpecified(newNullability).wrapEnhancement(enhancement)
+            = origin.makeNullableAsSpecified(newNullability).wrapEnhancement(TypeUtils.makeNullableAsSpecified(enhancement, newNullability))
 
     override fun render(renderer: DescriptorRenderer, options: DescriptorRendererOptions): String
             = origin.render(renderer, options)
