@@ -115,6 +115,8 @@ var JsNameRef.coroutineReceiver by MetadataProperty(default = false)
 
 var JsFunction.forceStateMachine by MetadataProperty(default = false)
 
+var JsFunction.isInlineableCoroutineBody by MetadataProperty(default = false)
+
 var JsName.imported by MetadataProperty(default = false)
 
 var JsFunction.coroutineMetadata: CoroutineMetadata? by MetadataProperty(default = null)

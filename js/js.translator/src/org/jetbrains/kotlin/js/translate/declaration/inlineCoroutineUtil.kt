@@ -49,7 +49,11 @@ fun <T : JsNode> transformCoroutineMetadataToSpecialFunctions(context: Translati
             }
             if (specialFunction != null) {
                 val arguments = listOfNotNull(x.qualifier).toTypedArray()
-                ctx.replaceMe(TranslationUtils.invokeSpecialFunction(context, specialFunction, *arguments).source(x.source))
+                ctx.replaceMe(TranslationUtils.invokeSpecialFunction(context, specialFunction, *arguments).apply {
+                    synthetic = x.synthetic
+                    sideEffects = x.sideEffects
+                    source = x.source
+                })
             }
             else {
                 super.endVisit(x, ctx)
@@ -93,7 +97,12 @@ fun <T : JsNode> transformSpecialFunctionsToCoroutineMetadata(node: T): T {
                     }
                     else -> null
                 }
-                replacement?.let { ctx.replaceMe(it) }
+                replacement?.let {
+                    it.source = x.source
+                    it.sideEffects = x.sideEffects
+                    it.synthetic = x.synthetic
+                    ctx.replaceMe(it)
+                }
             }
         }
     }
