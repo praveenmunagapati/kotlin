@@ -196,18 +196,13 @@ public enum PrimitiveBinaryOperationFIF implements FunctionIntrinsicFactory {
                 return JsBinaryOperator.BIT_OR;
             case "and":
                 return JsBinaryOperator.BIT_AND;
+            case "xor":
+                return JsBinaryOperator.BIT_XOR;
             default:
                 break;
         }
 
         KtToken token = OperatorConventions.BINARY_OPERATION_NAMES.inverse().get(descriptorName);
-        if (token == null) {
-            token = OperatorConventions.BOOLEAN_OPERATIONS.inverse().get(descriptorName);
-        }
-        if (token == null) {
-            assert descriptorName.asString().equals("xor");
-            return JsBinaryOperator.BIT_XOR;
-        }
         return OperatorTable.getBinaryOperator(token);
     }
 
