@@ -92,14 +92,14 @@ extra["ideaPluginDir"] = project.file(ideaPluginDir)
 extra["ideaUltimatePluginDir"] = project.file(ideaUltimatePluginDir)
 extra["isSonatypeRelease"] = false
 
-Properties().apply {
+/*Properties().apply {
     load(File(rootDir, "resources", "kotlinManifest.properties").reader())
     forEach {
         val key = it.key
         if (key != null && key is String)
             extra[key] = it.value
     }
-}
+}*/
 
 extra["JDK_16"] = jdkPath("1.6")
 extra["JDK_17"] = jdkPath("1.7")
@@ -203,11 +203,6 @@ tasks.matching { task ->
 //task("update-dependencies") {
 //    dependsOn(tasks.getByName(importedAntTasksPrefix + "update"))
 //}
-
-fun Project.allprojectsRecursive(body: Project.() -> Unit) {
-    this.body()
-    this.subprojects { allprojectsRecursive(body) }
-}
 
 fun Task.listConfigurationContents(configName: String) {
     doFirst {
