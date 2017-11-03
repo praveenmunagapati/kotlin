@@ -66,6 +66,7 @@ fun testDoubleArray() {
 
 fun box(): String {
     testArray()
+    testArrayAlias()
     testIntArray()
     testLongArray()
     testBooleanArray()
