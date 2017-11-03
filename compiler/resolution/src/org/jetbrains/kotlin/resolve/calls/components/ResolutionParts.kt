@@ -102,6 +102,9 @@ internal object ArgumentsToCandidateParameterDescriptor : ResolutionPart() {
         for ((originalValueParameter, resolvedCallArgument) in resolvedCall.argumentMappingByOriginal) {
             val valueParameter = candidateDescriptor.valueParameters.getOrNull(originalValueParameter.index) ?: continue
             for (argument in resolvedCallArgument.arguments) {
+                if (argument.isSpread && !valueParameter.isVararg) {
+                    addDiagnostic(SpreadArgumentToNonVarargParameter(argument))
+                }
                 map[argument] = valueParameter
             }
         }
