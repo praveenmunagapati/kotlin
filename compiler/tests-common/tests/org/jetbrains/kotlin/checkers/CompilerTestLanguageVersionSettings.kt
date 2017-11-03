@@ -50,6 +50,8 @@ fun parseLanguageVersionSettings(directiveMap: Map<String, String>): LanguageVer
     return CompilerTestLanguageVersionSettings(languageFeatures, apiVersion, LanguageVersion.LATEST_STABLE)
 }
 
+data class DiagnosticWithPosition(val diagnostic: CheckerTestUtil.TextDiagnostic, val start: Int, val end: Int)
+
 private val languagePattern = Pattern.compile("(\\+|\\-|warn:)(\\w+)\\s*")
 
 private fun collectLanguageFeatureMap(directives: String): Map<LanguageFeature, LanguageFeature.State> {
