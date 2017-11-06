@@ -183,7 +183,7 @@ public class CheckerTestUtilTest extends KotlinTestWithEnvironment {
                 }
 
                 @Override
-                public void additionalDiagnostic(CheckerTestUtil.TextDiagnostic diagnostic, int expectedStart, int expectedEnd) {
+                public void uncheckedDiagnostic(CheckerTestUtil.TextDiagnostic diagnostic, int expectedStart, int expectedEnd) {
                 }
 
                 @Override

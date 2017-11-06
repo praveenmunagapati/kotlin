@@ -225,7 +225,7 @@ abstract class BaseDiagnosticsTest : KotlinMultiFileTestWithJava<TestModule, Tes
                     { whatDiagnosticsToConsider.value(it.diagnostic) }
             )
 
-            val additionalDiagnostics = mutableListOf<PositionalTextDiagnostic>()
+            val uncheckedDiagnostics = mutableListOf<PositionalTextDiagnostic>()
 
             val diagnosticToExpectedDiagnostic = CheckerTestUtil.diagnosticsDiff(diagnosedRanges, diagnostics, object : CheckerTestUtil.DiagnosticDiffCallbacks {
                 override fun missingDiagnostic(diagnostic: CheckerTestUtil.TextDiagnostic, expectedStart: Int, expectedEnd: Int) {
@@ -253,8 +253,8 @@ abstract class BaseDiagnosticsTest : KotlinMultiFileTestWithJava<TestModule, Tes
                     ok[0] = false
                 }
 
-                override fun additionalDiagnostic(diagnostic: CheckerTestUtil.TextDiagnostic, expectedStart: Int, expectedEnd: Int) {
-                    additionalDiagnostics.add(PositionalTextDiagnostic(diagnostic, expectedStart, expectedEnd))
+                override fun uncheckedDiagnostic(diagnostic: CheckerTestUtil.TextDiagnostic, expectedStart: Int, expectedEnd: Int) {
+                    uncheckedDiagnostics.add(PositionalTextDiagnostic(diagnostic, expectedStart, expectedEnd))
                 }
 
                 override fun shouldUseDiagnosticsForNI(): Boolean = withNewInference
@@ -263,7 +263,7 @@ abstract class BaseDiagnosticsTest : KotlinMultiFileTestWithJava<TestModule, Tes
             })
 
             actualText.append(CheckerTestUtil.addDiagnosticMarkersToText(
-                    ktFile, diagnostics, diagnosticToExpectedDiagnostic, { file -> file.text }, additionalDiagnostics, withNewInferenceDirective)
+                    ktFile, diagnostics, diagnosticToExpectedDiagnostic, { file -> file.text }, uncheckedDiagnostics, withNewInferenceDirective)
             )
 
             stripExtras(actualText)

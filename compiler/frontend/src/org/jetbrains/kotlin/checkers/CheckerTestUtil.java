@@ -214,7 +214,7 @@ public class CheckerTestUtil {
 
         void unexpectedDiagnostic(TextDiagnostic diagnostic, int actualStart, int actualEnd);
 
-        void additionalDiagnostic(TextDiagnostic diagnostic, int expectedStart, int expectedEnd);
+        void uncheckedDiagnostic(TextDiagnostic diagnostic, int expectedStart, int expectedEnd);
 
         boolean shouldUseDiagnosticsForNI();
 
@@ -241,7 +241,7 @@ public class CheckerTestUtil {
             if (currentExpected != null) {
                 boolean currentDiagnosticsForNI = CollectionsKt.any(currentExpected.diagnostics, diagnostic -> diagnostic.withNewInference);
                 if (callbacks.shouldUseDiagnosticsForNI() != currentDiagnosticsForNI) {
-                    additionalDiagnostics(callbacks, currentExpected);
+                    uncheckedDiagnostics(callbacks, currentExpected);
                     currentExpected = safeAdvance(expectedDiagnostics);
                     continue;
                 }
@@ -371,9 +371,9 @@ public class CheckerTestUtil {
         }
     }
 
-    private static void additionalDiagnostics(DiagnosticDiffCallbacks callbacks, DiagnosedRange currentExpected) {
+    private static void uncheckedDiagnostics(DiagnosticDiffCallbacks callbacks, DiagnosedRange currentExpected) {
         for (TextDiagnostic diagnostic : currentExpected.getDiagnostics()) {
-            callbacks.additionalDiagnostic(diagnostic, currentExpected.getStart(), currentExpected.getEnd());
+            callbacks.uncheckedDiagnostic(diagnostic, currentExpected.getStart(), currentExpected.getEnd());
         }
     }
 
@@ -421,18 +421,18 @@ public class CheckerTestUtil {
             @NotNull Collection<ActualDiagnostic> diagnostics,
             @NotNull Map<ActualDiagnostic, TextDiagnostic> diagnosticToExpectedDiagnostic,
             @NotNull Function<PsiFile, String> getFileText,
-            @NotNull Collection<PositionalTextDiagnostic> additionalDiagnostics,
+            @NotNull Collection<PositionalTextDiagnostic> uncheckedDiagnostics,
             boolean withNewInferenceDirective
     ) {
         String text = getFileText.fun(psiFile);
         StringBuffer result = new StringBuffer();
         diagnostics = CollectionsKt.filter(diagnostics, actualDiagnostic -> psiFile.equals(actualDiagnostic.getFile()));
-        if (diagnostics.isEmpty() && additionalDiagnostics.isEmpty()) {
+        if (diagnostics.isEmpty() && uncheckedDiagnostics.isEmpty()) {
             result.append(text);
             return result;
         }
 
-        List<AbstractDiagnosticDescriptor> diagnosticDescriptors = getSortedDiagnosticDescriptors(diagnostics, additionalDiagnostics, !withNewInferenceDirective);
+        List<AbstractDiagnosticDescriptor> diagnosticDescriptors = getSortedDiagnosticDescriptors(diagnostics, uncheckedDiagnostics, !withNewInferenceDirective);
 
         Stack<AbstractDiagnosticDescriptor> opened = new Stack<>();
         ListIterator<AbstractDiagnosticDescriptor> iterator = diagnosticDescriptors.listIterator();
@@ -642,14 +642,14 @@ public class CheckerTestUtil {
     @NotNull
     private static List<AbstractDiagnosticDescriptor> getSortedDiagnosticDescriptors(
             @NotNull Collection<ActualDiagnostic> diagnostics,
-            @NotNull Collection<PositionalTextDiagnostic> additionalDiagnostics,
+            @NotNull Collection<PositionalTextDiagnostic> uncheckedDiagnostics,
             boolean groupDiagnosticsByRange
     ) {
         List<ActualDiagnostic> validDiagnostics = CollectionsKt.filter(diagnostics, actualDiagnostic -> actualDiagnostic.diagnostic.isValid());
         List<AbstractDiagnosticDescriptor> diagnosticDescriptors = groupDiagnosticsByRange ?
                                                            groupDiagnosticsByTextRange(validDiagnostics) :
                                                            asPlainDiagnosticDescriptors(validDiagnostics);
-        for (PositionalTextDiagnostic diagnostic : additionalDiagnostics) {
+        for (PositionalTextDiagnostic diagnostic : uncheckedDiagnostics) {
             diagnosticDescriptors.add(new TextDiagnosticDescriptor(diagnostic));
         }
         diagnosticDescriptors.sort((d1, d2) -> {
