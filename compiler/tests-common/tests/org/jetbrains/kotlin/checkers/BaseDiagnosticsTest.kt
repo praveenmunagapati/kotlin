@@ -324,6 +324,7 @@ abstract class BaseDiagnosticsTest : KotlinMultiFileTestWithJava<TestModule, Tes
 
         val WITH_NEW_INFERENCE_DIRECTIVE = "WITH_NEW_INFERENCE"
 
+        // Change it to "true" to load diagnostics for old inference to test new inference (ignore diagnostics with <NI; prefix)
         private val USE_OLD_INFERENCE_DIAGNOSTICS_FOR_NI = false
 
         private fun parseDiagnosticFilterDirective(directiveMap: Map<String, String>, allowUnderscoreUsage: Boolean): Condition<Diagnostic> {
