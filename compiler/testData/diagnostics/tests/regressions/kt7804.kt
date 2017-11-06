@@ -6,22 +6,22 @@ class A
 
 fun <T> test(v: T): T {
     val a = if (v !is A) {
-        foo(v) <!USELESS_CAST!>as T<!>
+        foo(v) <!NI;USELESS_CAST!><!USELESS_CAST!>as T<!><!>
     }
     else {
         v
     }
 
-    val t: T = a
+    val t: T = <!NI;DEBUG_INFO_SMARTCAST!>a<!>
     return t
 }
 
 fun <T> test2(v: T): T {
     val a = if (v !is A) {
-        foo(v) <!USELESS_CAST!>as T<!>
+        foo(v) <!NI;USELESS_CAST!><!USELESS_CAST!>as T<!><!>
     }
     else {
-        v <!USELESS_CAST!>as T<!>
+        v <!NI;USELESS_CAST!><!USELESS_CAST!>as T<!><!>
     }
 
     val t: T = a
@@ -36,13 +36,13 @@ fun <T> test3(v: T): T {
         v
     }
 
-    val t: T = a
+    val t: T = <!NI;DEBUG_INFO_SMARTCAST!>a<!>
     return t
 }
 
 fun <T> test4(v: T): T {
     val a: T = if (v !is A) {
-        foo(v) <!USELESS_CAST!>as T<!>
+        foo(v) <!NI;USELESS_CAST!><!USELESS_CAST!>as T<!><!>
     }
     else {
         v
