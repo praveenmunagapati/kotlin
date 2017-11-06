@@ -1,3 +1,4 @@
+// !WITH_NEW_INFERENCE
 // !LANGUAGE: -RefinedSamAdaptersPriority
 // !CHECK_TYPE
 // FILE: A.java
