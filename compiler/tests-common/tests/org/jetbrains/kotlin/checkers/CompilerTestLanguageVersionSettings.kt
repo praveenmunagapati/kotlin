@@ -45,7 +45,11 @@ fun parseLanguageVersionSettings(directiveMap: Map<String, String>): LanguageVer
     val apiVersion = (if (apiVersionString != null) ApiVersion.parse(apiVersionString) else ApiVersion.LATEST_STABLE)
                      ?: error("Unknown API version: $apiVersionString")
 
-    val languageFeatures = directives?.let(::collectLanguageFeatureMap).orEmpty()
+    val languageFeatures = directives?.let(::collectLanguageFeatureMap).orEmpty().toMutableMap()
+
+    if (System.getProperty("kotlin.ni") == "true") {
+        languageFeatures.put(LanguageFeature.NewInference, LanguageFeature.State.ENABLED)
+    }
 
     return CompilerTestLanguageVersionSettings(languageFeatures, apiVersion, LanguageVersion.LATEST_STABLE)
 }
