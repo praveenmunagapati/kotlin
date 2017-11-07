@@ -168,6 +168,10 @@ class FamilyPrimitiveMemberDefinition : MemberTemplateDefinition<PrimitiveType?>
         familyPrimitives[f] = primitives
     }
 
+    fun include(vararg fs: Family, primitives: Set<PrimitiveType?>) {
+        for (f in fs) include(f, primitives)
+    }
+
     fun exclude(vararg ps: PrimitiveType) {
         val toExclude = ps.toSet()
         for (e in familyPrimitives) {
