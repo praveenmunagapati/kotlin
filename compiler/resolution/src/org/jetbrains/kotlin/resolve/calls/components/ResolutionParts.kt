@@ -102,13 +102,23 @@ internal object ArgumentsToCandidateParameterDescriptor : ResolutionPart() {
         for ((originalValueParameter, resolvedCallArgument) in resolvedCall.argumentMappingByOriginal) {
             val valueParameter = candidateDescriptor.valueParameters.getOrNull(originalValueParameter.index) ?: continue
             for (argument in resolvedCallArgument.arguments) {
-                if (argument.isSpread && !valueParameter.isVararg) {
-                    addDiagnostic(SpreadArgumentToNonVarargParameter(argument))
-                }
                 map[argument] = valueParameter
             }
         }
         resolvedCall.argumentToCandidateParameter = map
+    }
+}
+
+internal object CheckSpreadArgumentToNonVarargParameter : ResolutionPart() {
+    override fun KotlinResolutionCandidate.process(workIndex: Int) {
+        for ((_, resolvedCallArgument) in resolvedCall.argumentMappingByOriginal) {
+            for (argument in resolvedCallArgument.arguments) {
+                val valueParameter = resolvedCall.argumentToCandidateParameter[argument] ?: continue
+                if (argument.isSpread && !valueParameter.isVararg) {
+                    addDiagnostic(SpreadArgumentToNonVarargParameter(argument))
+                }
+            }
+        }
     }
 }
 

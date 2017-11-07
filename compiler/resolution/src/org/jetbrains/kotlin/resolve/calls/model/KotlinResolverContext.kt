@@ -186,7 +186,8 @@ enum class KotlinCallKind(vararg resolutionPart: ResolutionPart) {
             ResolveReceiverArgumentPart,
             ReceiverAdditionalTypeCheckPart,
             CheckArguments,
-            CheckExternalArgument
+            CheckExternalArgument,
+            CheckSpreadArgumentToNonVarargParameter
     ),
     UNSUPPORTED();
 
