@@ -541,6 +541,8 @@ class DelegatedPropertyResolver(
                                                                                languageVersionSettings)
 
             val delegateTypeConstructor = delegateTypeInfo.type?.constructor
+
+//          This is a temporary hack, probably we should complete call if it doesn't contain unfixed type variables
             val delegateType = if (delegateTypeConstructor is IntegerValueTypeConstructor)
                 TypeUtils.getDefaultPrimitiveNumberType(delegateTypeConstructor)
             else
