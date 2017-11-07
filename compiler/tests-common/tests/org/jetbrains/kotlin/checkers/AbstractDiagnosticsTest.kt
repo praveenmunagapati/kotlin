@@ -148,7 +148,7 @@ abstract class AbstractDiagnosticsTest : BaseDiagnosticsTest() {
                 && environment.configuration.getBoolean(JVMConfigurationKeys.USE_JAVAC) -> ".javac.txt"
 
                 InTextDirectivesUtils.isDirectiveDefined(originalTestFile, "// NI_EXPECTED_FILE") &&
-                files.any { it.newInferenceEnabled } -> ".ni.txt"
+                files.any { it.newInferenceEnabled } && !USE_OLD_INFERENCE_DIAGNOSTICS_FOR_NI -> ".ni.txt"
 
                 else -> ".txt"
             }
